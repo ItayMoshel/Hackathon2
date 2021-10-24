@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-
 headers = {"Accept-Language": "en-US, en;q=0.5"}
 
 url = "https://www.imdb.com/search/title/?groups=top_1000&ref_=adv_prv"
@@ -12,18 +11,22 @@ soup = BeautifulSoup(results.text, "html.parser")
 
 # Data type lists.
 titles = []
+genres = []
 years = []
 time = []
 imdb_ratings = []
 metascores = []
 votes = []
-us_gross = []
 
 movie_div = soup.find_all('div', class_='lister-item mode-advanced')
 for container in movie_div:
     # Name
     name = container.h3.a.text
     titles.append(name)
+
+    # Genre
+    genre = container.find('span', class_="genre").text.strip('\n').strip()
+    genres.append(genre)
 
     # Year
     year = container.h3.find('span', class_="lister-item-year text-muted unbold").text
@@ -46,8 +49,11 @@ for container in movie_div:
     vote = nv[0].text
     votes.append(vote)
 
+print(genres)
+
 movies = pd.DataFrame({
     'movie': titles,
+    'Genre': genres,
     'year': years,
     'movie_length': time,
     'imdb_score': imdb_ratings,
